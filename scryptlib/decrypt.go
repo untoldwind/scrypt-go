@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"hash"
 	"io"
 
@@ -55,9 +56,10 @@ func decodeHeader(password, headerBytes []byte) ([]byte, error) {
 	if !bytes.Equal(headerhash[:16], header.HeaderHash[:]) {
 		return nil, errors.New("Header checksum does not match")
 	}
-	N := 1 << header.LogN
 
-	dk, err := scrypt.Key(password, header.Salt[:], N, int(header.R), int(header.P), 64)
+	fmt.Println(header.Params)
+	N := 1 << header.Params.LogN
+	dk, err := scrypt.Key(password, header.Salt[:], N, int(header.Params.R), int(header.Params.P), 64)
 	if err != nil {
 		return nil, err
 	}

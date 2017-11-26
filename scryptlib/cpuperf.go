@@ -1,7 +1,6 @@
 package scryptlib
 
 import (
-	"fmt"
 	"time"
 
 	"golang.org/x/crypto/scrypt"
@@ -27,31 +26,34 @@ func cpuperf() (int64, error) {
 	return i * int64(time.Second) / int64(diff), nil
 }
 
-func pickparams(memlimit uint64, maxtime float64) error {
+func pickparams(memlimit uint64, maxtime float64) (*Params, error) {
 	ops, err := cpuperf()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	opslimit := float64(ops) * maxtime
 	if opslimit < 32768 {
 		opslimit = 32768
 	}
-	R := 8
+	R := uint32(8)
 	if opslimit < float64(memlimit/32) {
 		maxN := int(opslimit / float64(R*4))
-		fmt.Println(maxN)
-		for logN := uint(1); logN < 63; logN++ {
+		logN := uint8(1)
+		for ; logN < 63; logN++ {
 			if (2 << logN) > maxN {
-				fmt.Println(logN)
 				break
 			}
 		}
+		return &Params{
+			LogN: logN,
+			R:    R,
+			P:    1,
+		}, nil
 	} else {
 		maxN := int(memlimit / uint64(R*120))
-		var logN uint
-		for logN = 1; logN < 63; logN++ {
+		logN := uint8(1)
+		for ; logN < 63; logN++ {
 			if (2 << logN) > maxN {
-				fmt.Println(logN)
 				break
 			}
 		}
@@ -60,6 +62,10 @@ func pickparams(memlimit uint64, maxtime float64) error {
 		if maxrp > 0x3fffffff {
 			maxrp = 0x3fffffff
 		}
+		return &Params{
+			LogN: logN,
+			R:    R,
+			P:    uint32(maxrp),
+		}, nil
 	}
-	return nil
 }

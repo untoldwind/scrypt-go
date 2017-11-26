@@ -11,6 +11,10 @@ format:
 	@echo "--> Running go fmt"
 	@go fmt ./...
 
+test: export GOPATH=${PWD}/../../../..
+test:
+	@echo "--> Running go test"
+	@go test -v ./...
 
 dep.install:
 	@echo "-> dep install"

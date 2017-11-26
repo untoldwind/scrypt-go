@@ -22,5 +22,6 @@
 
 required = [
     "golang.org/x/crypto/scrypt",
-    "gopkg.in/urfave/cli.v2"
+    "gopkg.in/urfave/cli.v2",
+    "github.com/stretchr/testify"
 ]
