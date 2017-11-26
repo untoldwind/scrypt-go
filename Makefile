@@ -23,3 +23,5 @@ dep.install:
 
 dep.ensure: dep.install
 	@bin/dep ensure
+	@bin/dep prune
+	
