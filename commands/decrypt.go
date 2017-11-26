@@ -38,5 +38,10 @@ func decrypt(ctx *cli.Context) error {
 		out = outFile
 	}
 
-	return scryptlib.Decrypt([]byte("12345678"), in, out)
+	passphrase, err := readPassphrase("Passphrase: ")
+	if err != nil {
+		return nil
+	}
+
+	return scryptlib.Decrypt([]byte(passphrase), in, out)
 }

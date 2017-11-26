@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"io"
 	"os"
 
@@ -37,5 +38,17 @@ func encrypt(ctx *cli.Context) error {
 		out = outFile
 	}
 
-	return scryptlib.Encrypt([]byte("12345678"), in, out)
+	passphrase, err := readPassphrase("Passphrase          : ")
+	if err != nil {
+		return nil
+	}
+	passphraseConfirm, err := readPassphrase("Passphrease (confirm): ")
+	if err != nil {
+		return nil
+	}
+	if passphrase != passphraseConfirm {
+		return errors.New("Passphare does not match")
+	}
+
+	return scryptlib.Encrypt([]byte(passphrase), in, out)
 }
