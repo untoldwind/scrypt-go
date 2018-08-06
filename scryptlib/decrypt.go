@@ -50,6 +50,7 @@ func decodeHeader(password, headerBytes []byte) ([]byte, error) {
 	if header.Version != 0 {
 		return nil, errors.New("Invalid file version")
 	}
+
 	headerhash := sha256.Sum256(headerBytes[0:48])
 
 	if !bytes.Equal(headerhash[:16], header.HeaderHash[:]) {
@@ -84,7 +85,7 @@ func decryptStream(aesKey []byte, hmac256 hash.Hash, in io.Reader, out io.Writer
 	bufferLen := 0
 
 	for {
-		n, err := in.Read(buffer)
+		n, err := in.Read(buffer[bufferLen:])
 		bufferLen += n
 		if bufferLen > 32 {
 			hmac256.Write(buffer[:bufferLen-32])

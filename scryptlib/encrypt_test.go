@@ -2,6 +2,7 @@ package scryptlib_test
 
 import (
 	"bytes"
+	"crypto/rand"
 	"testing"
 
 	"github.com/untoldwind/scrypt-go/scryptlib"
@@ -20,4 +21,19 @@ func TestEncryptDecrypt(t *testing.T) {
 	err = scryptlib.Decrypt([]byte("12345678"), encryptedOut, decryptedOut)
 	require.Nil(err)
 
+	require.Equal("Simple test message", decryptedOut.String())
+
+	longMessage := make([]byte, 20000)
+	_, err = rand.Read(longMessage)
+	require.Nil(err)
+
+	encryptedLongOut := bytes.NewBuffer(nil)
+	err = scryptlib.Encrypt([]byte("12345678"), bytes.NewBuffer(longMessage), encryptedLongOut)
+	require.Nil(err)
+
+	decryptedLongOut := bytes.NewBuffer(nil)
+	err = scryptlib.Decrypt([]byte("12345678"), encryptedLongOut, decryptedLongOut)
+	require.Nil(err)
+
+	require.Equal(longMessage, decryptedLongOut.Bytes())
 }
